@@ -58,17 +58,18 @@ RUN apt-get update \
 RUN npm install -g @devcontainers/cli
 RUN mkdir ${VIRTUAL_ENV} && chown ${UID}:${GID} ${VIRTUAL_ENV}
 
+# install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
 USER ${DEV_USER}
 
-# install pdm
-RUN python -m pip install --user pdm
 ENV PATH "/home/${DEV_USER}/.local/bin:${PATH}"
 
 # install dependencies into virtualenv
 WORKDIR ${BUILD_DIR}
-RUN python3 -m venv ${VIRTUAL_ENV}
-COPY pyproject.toml pdm.lock README.md ${BUILD_DIR}
-RUN pdm sync --dev
+RUN uv venv ${VIRTUAL_ENV}
+COPY pyproject.toml uv.lock README.md ${BUILD_DIR}
+RUN uv sync --locked
 
 WORKDIR /workspace
 

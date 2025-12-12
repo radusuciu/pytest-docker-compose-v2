@@ -9,8 +9,6 @@ jobs:
   build-and-publish:
     runs-on: ubuntu-latest
     environment: pypi-publish
-    env:
-        VIRTUAL_ENV: .venv
     permissions:
       # for creating github release
       contents: write
@@ -19,23 +17,16 @@ jobs:
     steps:
     - name: Check out repository
       uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v7
       with:
+        enable-cache: true
         python-version: '3.11'
-    - name: Set up PDM
-      uses: pdm-project/setup-pdm@v4
-      with:
-        python-version: '3.11'
-        cache: true
+
     - name: Install dependencies
-      run: |
-        python -m venv ${{ env.VIRTUAL_ENV }}
-        pdm sync --verbose --dev
+      run: uv sync
     - name: Run tests
-      run: |
-        source ${{ env.VIRTUAL_ENV }}/bin/activate
-        python -m pytest
+      run: uv run pytest
     - name: Create GitHub release
       uses: softprops/action-gh-release@v1
       with:
@@ -44,6 +35,4 @@ jobs:
         draft: false
         prerelease: false
     - name: Build and publish to PyPI
-      run: |
-        source ${{ env.VIRTUAL_ENV }}/bin/activate
-        pdm publish
+      run: uv publish
