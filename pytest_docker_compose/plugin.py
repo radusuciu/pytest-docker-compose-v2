@@ -52,13 +52,16 @@ def create_network_info_for_container(container: Container):
     # container.ports == {'4369/tcp': None,
     # '5984/tcp': [{'HostIp': '0.0.0.0', 'HostPort': '32872'}],
     # '9100/tcp': None}
+    ports = container.network_settings.ports
+    if ports is None:
+        return []
     return [
         NetworkInfo(
             container_port=container_port,
             hostname=port_config["HostIp"] or "localhost",
             host_port=port_config["HostPort"],
         )
-        for container_port, port_configs in container.network_settings.ports.items()
+        for container_port, port_configs in ports.items()
         if port_configs is not None
         for port_config in port_configs
     ]
@@ -287,6 +290,7 @@ class ContainerGetter:
         containers = {
             container.config.labels["com.docker.compose.service"]: container
             for container in self.docker_project.compose.ps(all=True)
+            if container.config.labels is not None
         }
         containers_running = {
             key: value for key, value in containers.items() if value.state.running
