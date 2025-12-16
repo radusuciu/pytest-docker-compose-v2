@@ -46,7 +46,7 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "ruff>=0.0.259",
+    "ruff>=0.14.9",
     "bumpver>=2022.1120",
     "git-cliff>=2.0.4",
     "psycopg2-binary>=2.9.9",
