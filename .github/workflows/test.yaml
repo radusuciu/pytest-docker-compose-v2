@@ -15,6 +15,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.9', '3.10', '3.11', '3.12']
+        pytest-version: ['7', '8']
     steps:
     - name: Check out repository
       uses: actions/checkout@v4
@@ -30,6 +31,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: uv sync
+    - name: Install pytest ${{ matrix.pytest-version }}
+      run: uv pip install "pytest>=${{ matrix.pytest-version }},<$(( ${{ matrix.pytest-version }} + 1 ))"
     - name: Run tests
       run: uv run pytest
     # NOTE: publishing to test repository is disabled until I figure out a way to do it reliably
