@@ -19,7 +19,7 @@ jobs:
         pytest-version: ['7', '8', '9']
     steps:
     - name: Check out repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       # needed because we use git describe to get a bumpver compatible GITHASH containing version
       # alternatively can look at using HEXHASH instead. Note that these are purposefully not
       # documented in the bumpver project, see issues/PRs for more info.
