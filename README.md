@@ -43,7 +43,7 @@ To interact with Docker containers in your tests, use the following fixtures. Th
 
 ### `function_scoped_container_getter`
 
-An object that fetches containers of the Docker `compose.container.Container` objects running during the test. The containers are fetched using `function_scoped_container_getter.get('service_name')` These containers each have an extra attribute called `network_info` added to them. This attribute has a list of `pytest_docker_compose.NetworkInfo` objects.
+An object that fetches containers of the Docker `python_on_whales.Container` objects running during the test. The containers are fetched using `function_scoped_container_getter.get('service_name')` These containers each have an extra attribute called `network_info` added to them. This attribute has a list of `pytest_docker_compose.NetworkInfo` objects.
 
 This information can be used to configure API clients and other objects that will connect to services exposed by the Docker containers in your tests.
 
@@ -59,12 +59,12 @@ This information can be used to configure API clients and other objects that wil
 
 ### `docker_project`
 
-The `compose.project.Project` object that the containers are built from.
+The `python_on_whales.DockerClient` object that the containers are built from.
 This fixture is generally only used internally by the plugin.
 
 ### Wider scoped fixtures
 
-To use the following fixtures please read [Use wider scoped fixtures](#use-wider-scope-fixtures)
+To use the following fixtures please read [Use wider scoped fixtures](#use-wider-scoped-fixtures)
 
 - `class_scoped_container_getter`: Similar to `function_scoped_container_getter` just with a wider scope.
 - `module_scoped_container_getter`: Similar to `function_scoped_container_getter` just with a wider scope.
@@ -132,7 +132,7 @@ pytest --use-running-containers
 
 With this flag, `pytest-docker-compose` checks that all containers are running
 during the project creation. If they are not running a warning is given and
-they are spun up anyways. They are then used for all the tests and NOT TORE
+they are spun up anyways. They are then used for all the tests and NOT TORN
 DOWN afterwards.
 
 This mode is best used in combination with the `--docker-compose-no-build` flag since the newly build containers won't be used anyways. like so:
@@ -181,7 +181,7 @@ addopts = --docker-compose=/path/to/docker-compose.yml
 
 The option will be ignored for tests that do not use this plugin.
 
-See [Configuration Options](https://docs.pytest.org/en/latest/customize.html#adding-default-options) for more information on using configuration
+See [Configuration Options](https://docs.pytest.org/en/stable/reference/customize.html#adding-default-options) for more information on using configuration
 files to modify pytest behavior.
 
 ### Remove volumes after tests

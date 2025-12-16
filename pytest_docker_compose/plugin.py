@@ -92,7 +92,7 @@ class DockerComposePlugin:
         """
         Adds custom options to the ``pytest`` command.
 
-        https://docs.pytest.org/en/latest/how-to/writing_plugins.html#testing-plugins
+        https://docs.pytest.org/en/stable/reference/reference.html#pytest.hookspec.pytest_addoption
         """
         group = parser.getgroup("docker_compose", "integration tests")
 
