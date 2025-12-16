@@ -17,8 +17,8 @@ Make sure you have [Docker](https://docs.docker.com/get-docker/) installed.
 
 This plugin is automatically tested against the following software:
 
-- Python 3.9, 3.10, 3.11 and 3.12
-- pytest 7
+- Python 3.10, 3.11, 3.12, 3.13 and 3.14
+- pytest 7, 8 and 9
 
 **NOTE**: This plugin is **not** compatible with Python 2.
 
@@ -33,20 +33,17 @@ pip install pytest-docker-compose-v2
 
 ## Usage
 
-For performance reasons, the plugin is not enabled by default, so you must activate it manually in the tests that use it:
+The plugin is automatically enabled when installed. To disable it for specific test runs, use:
 
-```python
-pytest_plugins = ["docker_compose"]
+```shell
+pytest -p no:docker_compose
 ```
 
-
-See [Installing and Using Plugins](https://docs.pytest.org/en/latest/plugins.html#requiring-loading-plugins-in-a-test-module-or-conftest-file) for more information.
-
-To interact with Docker containers in your tests, use the following fixtures, these fixtures tell docker-compose to start all the services and then they can fetch the associated containers for use in a test:
+To interact with Docker containers in your tests, use the following fixtures. These fixtures tell docker-compose to start all the services and then fetch the associated containers for use in a test:
 
 ### `function_scoped_container_getter`
 
-An object that fetches containers of the Docker `compose.container.Container` objects running during the test. The containers are fetched using `function_scoped_container_getter.get('service_name')` These containers each have an extra attribute called `network_info` added to them. This attribute has a list of `pytest_docker_compose.NetworkInfo` objects.
+An object that fetches containers of the Docker `python_on_whales.Container` objects running during the test. The containers are fetched using `function_scoped_container_getter.get('service_name')` These containers each have an extra attribute called `network_info` added to them. This attribute has a list of `pytest_docker_compose.NetworkInfo` objects.
 
 This information can be used to configure API clients and other objects that will connect to services exposed by the Docker containers in your tests.
 
@@ -62,12 +59,12 @@ This information can be used to configure API clients and other objects that wil
 
 ### `docker_project`
 
-The `compose.project.Project` object that the containers are built from.
+The `python_on_whales.DockerClient` object that the containers are built from.
 This fixture is generally only used internally by the plugin.
 
 ### Wider scoped fixtures
 
-To use the following fixtures please read [Use wider scoped fixtures](#use-wider-scope-fixtures)
+To use the following fixtures please read [Use wider scoped fixtures](#use-wider-scoped-fixtures)
 
 - `class_scoped_container_getter`: Similar to `function_scoped_container_getter` just with a wider scope.
 - `module_scoped_container_getter`: Similar to `function_scoped_container_getter` just with a wider scope.
@@ -89,8 +86,6 @@ import requests
 from urllib.parse import urljoin
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
-
-pytest_plugins = ["docker_compose"]
 
 # Invoking this fixture: 'function_scoped_container_getter' starts all services
 @pytest.fixture(scope="function")
@@ -137,7 +132,7 @@ pytest --use-running-containers
 
 With this flag, `pytest-docker-compose` checks that all containers are running
 during the project creation. If they are not running a warning is given and
-they are spun up anyways. They are then used for all the tests and NOT TORE
+they are spun up anyways. They are then used for all the tests and NOT TORN
 DOWN afterwards.
 
 This mode is best used in combination with the `--docker-compose-no-build` flag since the newly build containers won't be used anyways. like so:
@@ -186,7 +181,7 @@ addopts = --docker-compose=/path/to/docker-compose.yml
 
 The option will be ignored for tests that do not use this plugin.
 
-See [Configuration Options](https://docs.pytest.org/en/latest/customize.html#adding-default-options) for more information on using configuration
+See [Configuration Options](https://docs.pytest.org/en/stable/reference/customize.html#adding-default-options) for more information on using configuration
 files to modify pytest behavior.
 
 ### Remove volumes after tests

@@ -9,10 +9,10 @@ authors = [
     {name = "Phoenix Zerin"},
 ]
 dependencies = [
-    "pytest>=7.2.2,<9",
+    "pytest>=7.2.2,<10",
     "python-on-whales>=0.69.0,<1"
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 readme = "README.md"
 license = {text = "Apache"}
 keywords = [
@@ -26,10 +26,11 @@ classifiers = [
   "Framework :: Pytest",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "License :: OSI Approved :: Apache Software License",
   "Operating System :: OS Independent",
 ]
@@ -56,7 +57,7 @@ dev = [
     "requests>=2.32.5",
     "tox>=4.30.3",
     "tox-uv>=1.28.1",
-    "pytest>=8.4.2,<9",
+    "pytest>=8,<10",
 ]
 
 [tool.hatch.version]
@@ -100,12 +101,13 @@ push = false
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-envlist = py{39,310,311,312}-pytest{7,8}
+envlist = py{310,311,312,313,314}-pytest{7,8,9}
 
 [testenv]
 deps =
     pytest7: pytest>=7,<8
     pytest8: pytest>=8,<9
+    pytest9: pytest>=9,<10
     python_on_whales
     ruff
     mypy
