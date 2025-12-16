@@ -1,4 +1,5 @@
-from contextlib import asynccontextmanager, contextmanager
+from contextlib import asynccontextmanager
+from typing import Annotated
 
 import psycopg2
 import psycopg2.pool as pool
@@ -17,7 +18,14 @@ db_pool = pool.SimpleConnectionPool(
 
 
 def get_db_connection():
-    return db_pool.getconn()
+    conn = db_pool.getconn()
+    try:
+        yield conn
+    finally:
+        db_pool.putconn(conn)
+
+
+DbConn = Annotated[psycopg2.extensions.connection, Depends(get_db_connection)]
 
 
 @asynccontextmanager
@@ -30,12 +38,15 @@ app = FastAPI(lifespan=lifespan)
 
 
 def create_database():
-    connection = get_db_connection()
-    with connection.cursor() as cursor:
-        cursor.execute(
-            "CREATE TABLE IF NOT EXISTS my_table (id serial PRIMARY KEY, num integer, data varchar);"
-        )
-        connection.commit()
+    connection = db_pool.getconn()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "CREATE TABLE IF NOT EXISTS my_table (id serial PRIMARY KEY, num integer, data varchar);"
+            )
+            connection.commit()
+    finally:
+        db_pool.putconn(connection)
 
 
 @app.get("/")
@@ -44,28 +55,21 @@ def read_root():
 
 
 @app.get("/items/all")
-def read_all(connection: psycopg2.extensions.connection = Depends(get_db_connection)):
+def read_all(connection: DbConn):
     with connection.cursor(cursor_factory=RealDictCursor) as cursor:
         cursor.execute("SELECT * FROM my_table;")
         return [row for row in cursor.fetchall()]
 
 
 @app.get("/items/{item_id}")
-def read_item(
-    item_id: int,
-    connection: psycopg2.extensions.connection = Depends(get_db_connection),
-):
+def read_item(item_id: int, connection: DbConn):
     with connection.cursor(cursor_factory=RealDictCursor) as cursor:
         cursor.execute("SELECT * FROM my_table WHERE num=%s;", (item_id,))
         return cursor.fetchone()
 
 
 @app.put("/items/{item_id}")
-def put_item(
-    item_id: int,
-    data_string: str = "abc'def",
-    connection: psycopg2.extensions.connection = Depends(get_db_connection),
-):
+def put_item(item_id: int, connection: DbConn, data_string: str = "abc'def"):
     with connection.cursor() as cursor:
         cursor.execute(
             "INSERT INTO my_table (num, data) VALUES (%s, %s) " "RETURNING *;",
@@ -76,10 +80,7 @@ def put_item(
 
 
 @app.delete("/items/{item_id}")
-def delete_item(
-    item_id: int,
-    connection: psycopg2.extensions.connection = Depends(get_db_connection),
-):
+def delete_item(item_id: int, connection: DbConn):
     with connection.cursor() as cursor:
         cursor.execute("DELETE FROM my_table WHERE num=%s RETURNING *;", (item_id,))
         connection.commit()
