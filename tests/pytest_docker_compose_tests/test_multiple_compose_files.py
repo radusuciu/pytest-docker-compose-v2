@@ -6,8 +6,6 @@ from requests.adapters import HTTPAdapter
 
 import pytest
 
-pytest_plugins = ["docker_compose"]
-
 
 @pytest.fixture(scope="module")
 def wait_for_api(module_scoped_container_getter):

@@ -17,8 +17,8 @@ Make sure you have [Docker](https://docs.docker.com/get-docker/) installed.
 
 This plugin is automatically tested against the following software:
 
-- Python 3.9, 3.10, 3.11 and 3.12
-- pytest 7
+- Python 3.10, 3.11, 3.12, 3.13 and 3.14
+- pytest 7, 8 and 9
 
 **NOTE**: This plugin is **not** compatible with Python 2.
 
@@ -33,16 +33,13 @@ pip install pytest-docker-compose-v2
 
 ## Usage
 
-For performance reasons, the plugin is not enabled by default, so you must activate it manually in the tests that use it:
+The plugin is automatically enabled when installed. To disable it for specific test runs, use:
 
-```python
-pytest_plugins = ["docker_compose"]
+```shell
+pytest -p no:docker_compose
 ```
 
-
-See [Installing and Using Plugins](https://docs.pytest.org/en/latest/plugins.html#requiring-loading-plugins-in-a-test-module-or-conftest-file) for more information.
-
-To interact with Docker containers in your tests, use the following fixtures, these fixtures tell docker-compose to start all the services and then they can fetch the associated containers for use in a test:
+To interact with Docker containers in your tests, use the following fixtures. These fixtures tell docker-compose to start all the services and then fetch the associated containers for use in a test:
 
 ### `function_scoped_container_getter`
 
@@ -89,8 +86,6 @@ import requests
 from urllib.parse import urljoin
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
-
-pytest_plugins = ["docker_compose"]
 
 # Invoking this fixture: 'function_scoped_container_getter' starts all services
 @pytest.fixture(scope="function")
