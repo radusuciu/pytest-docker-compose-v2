@@ -276,6 +276,14 @@ class DockerComposePlugin:
 
 plugin = DockerComposePlugin()
 
+# Expose hooks and fixtures at module level for pytest 8 compatibility
+pytest_addoption = plugin.pytest_addoption
+docker_project = plugin.docker_project
+function_scoped_container_getter = plugin.function_scoped_container_getter
+class_scoped_container_getter = plugin.class_scoped_container_getter
+module_scoped_container_getter = plugin.module_scoped_container_getter
+session_scoped_container_getter = plugin.session_scoped_container_getter
+
 
 class ContainerGetter:
     """
