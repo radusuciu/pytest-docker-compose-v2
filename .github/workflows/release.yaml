@@ -34,5 +34,7 @@ jobs:
         tag_name: ${{ github.ref }}
         draft: false
         prerelease: false
-    - name: Build and publish to PyPI
+    - name: Build package
+      run: uv build
+    - name: Publish to PyPI
       run: uv publish
