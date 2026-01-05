@@ -35,6 +35,8 @@ jobs:
       run: uv pip install "pytest>=${{ matrix.pytest-version }},<$(( ${{ matrix.pytest-version }} + 1 ))"
     - name: Run tests
       run: uv run pytest
+    - name: Run healthcheck wait tests
+      run: uv run pytest -m wait_for_healthcheck --docker-compose ./tests/pytest_docker_compose_tests/my_network_healthcheck --docker-compose-wait
     # NOTE: publishing to test repository is disabled until I figure out a way to do it reliably
     # this means that we need to avoid version clashes as well as local versions
     # see: https://github.com/pypa/packaging.python.org/issues/804
