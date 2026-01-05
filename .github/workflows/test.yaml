@@ -33,8 +33,10 @@ jobs:
       run: uv sync
     - name: Install pytest ${{ matrix.pytest-version }}
       run: uv pip install "pytest>=${{ matrix.pytest-version }},<$(( ${{ matrix.pytest-version }} + 1 ))"
-    - name: Run tests
+    - name: Run tests (default with healthcheck wait)
       run: uv run pytest
+    - name: Run tests (with --docker-compose-no-wait)
+      run: uv run pytest -m no_wait --docker-compose ./tests/pytest_docker_compose_tests/my_network --docker-compose-no-wait
     # NOTE: publishing to test repository is disabled until I figure out a way to do it reliably
     # this means that we need to avoid version clashes as well as local versions
     # see: https://github.com/pypa/packaging.python.org/issues/804

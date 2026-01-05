@@ -4,12 +4,27 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      - my_db
+      my_db:
+        condition: service_healthy
     restart: on-failure
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/')"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
   my_db:
     image: postgres:11.2-alpine
     ports:
       - "5432:5432"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
   my_short_lived_service:
     build: ./a_buildable_container
     entrypoint: /bin/echo
