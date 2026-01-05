@@ -67,11 +67,11 @@ path = "pytest_docker_compose/__init__.py"
 packages = ["pytest_docker_compose"]
 
 [tool.pytest.ini_options]
-addopts = "-m 'not (should_fail or multiple_compose_files or wait_for_healthcheck)' '--docker-compose' './tests/pytest_docker_compose_tests/my_network' '--docker-compose-no-build'"
+addopts = "-m 'not (should_fail or multiple_compose_files or no_wait)' '--docker-compose' './tests/pytest_docker_compose_tests/my_network' '--docker-compose-no-build'"
 markers = [
     "should_fail: marks a set of test that should throw an error when run",
     "multiple_compose_files: marks a test that uses more than one compose file",
-    "wait_for_healthcheck: marks tests that use --docker-compose-wait with healthchecks",
+    "no_wait: marks tests that run with --docker-compose-no-wait (uses retry logic instead of healthchecks)",
 ]
 minversion = "7.2"
 
@@ -119,9 +119,9 @@ commands=
     ruff check pytest_docker_compose
     mypy --namespace-packages --ignore-missing-imports pytest_docker_compose
     pytest
-    pytest -m multiple_compose_files --docker-compose ./tests/pytest_docker_compose_tests/my_network,./tests/pytest_docker_compose_tests/my_network/extra-service.yml
+    pytest -m no_wait --docker-compose ./tests/pytest_docker_compose_tests/my_network --docker-compose-no-wait
+    pytest -m multiple_compose_files --docker-compose ./tests/pytest_docker_compose_tests/my_network,./tests/pytest_docker_compose_tests/my_network/extra-service.yml --docker-compose-no-wait
     docker compose -f tests/pytest_docker_compose_tests/my_network/docker-compose.yml up -d
     pytest --use-running-containers
     docker compose -f tests/pytest_docker_compose_tests/my_network/docker-compose.yml down -v
-    pytest -m wait_for_healthcheck --docker-compose ./tests/pytest_docker_compose_tests/my_network_healthcheck --docker-compose-wait
 """

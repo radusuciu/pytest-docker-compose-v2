@@ -78,9 +78,9 @@ However, just because a container is up does not mean that the services running 
 
 #### Option 1: Using Docker Compose Healthchecks (Recommended)
 
-The simplest approach is to use Docker Compose's native `--wait` functionality with healthchecks defined in your `docker-compose.yml`. This lets Docker Compose handle waiting for services to be ready.
+By default, the plugin uses Docker Compose's native `--wait` functionality to wait for services to be ready. If your services have healthchecks defined in your `docker-compose.yml`, Docker Compose will wait until all services pass their healthchecks before tests run.
 
-First, define healthchecks in your `docker-compose.yml`:
+Define healthchecks in your `docker-compose.yml`:
 
 ```yaml
 services:
@@ -106,19 +106,17 @@ services:
       retries: 10
 ```
 
-Then run pytest with the `--docker-compose-wait` flag:
+You can specify a timeout (in seconds) for waiting:
 
 ```shell
-pytest --docker-compose-wait
+pytest --docker-compose-wait-timeout=120
 ```
 
-You can also specify a timeout (in seconds) for waiting:
+To disable this behavior and not wait for healthchecks:
 
 ```shell
-pytest --docker-compose-wait --docker-compose-wait-timeout=120
+pytest --docker-compose-no-wait
 ```
-
-With this approach, Docker Compose will wait until all services pass their healthchecks before tests run, eliminating the need for Python-based wait strategies.
 
 #### Option 2: Python-based Wait Fixtures
 
@@ -248,7 +246,7 @@ This option will be ignored if the plugin is not used. Again, this option can al
 | `--docker-compose-no-build` | Skip building Docker images before running tests. |
 | `--docker-compose-remove-volumes` | Remove container volumes after tests complete. |
 | `--use-running-containers` | Use already running containers instead of starting new ones. |
-| `--docker-compose-wait` | Wait for services to be healthy before running tests (requires healthcheck definitions). |
+| `--docker-compose-no-wait` | Don't wait for services to be healthy before running tests (waiting is enabled by default). |
 | `--docker-compose-wait-timeout` | Timeout in seconds when waiting for services to be healthy. |
 
 For more examples on how to use this plugin look at the testing suite of this plugin itself! It will give you some examples for configuring `pyproject.toml` and how to use the different fixtures to run docker containers.
