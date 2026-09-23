@@ -78,9 +78,9 @@ However, just because a container is up does not mean that the services running 
 
 #### Option 1: Using Docker Compose Healthchecks (Recommended)
 
-By default, the plugin uses Docker Compose's native `--wait` functionality to wait for services to be ready. If your services have healthchecks defined in your `docker-compose.yml`, Docker Compose will wait until all services pass their healthchecks before tests run.
+The plugin can use Docker Compose's native `--wait` functionality with healthchecks defined in your `docker-compose.yml`. This lets Docker Compose handle waiting for services to be ready.
 
-Define healthchecks in your `docker-compose.yml`:
+First, define healthchecks in your `docker-compose.yml`:
 
 ```yaml
 services:
@@ -106,17 +106,19 @@ services:
       retries: 10
 ```
 
-You can specify a timeout (in seconds) for waiting:
+Then opt in to waiting when you run pytest:
 
 ```shell
-pytest --docker-compose-wait-timeout=120
+pytest --docker-compose-wait
 ```
 
-To disable this behavior and not wait for healthchecks:
+You can also specify a timeout (in seconds):
 
 ```shell
-pytest --docker-compose-no-wait
+pytest --docker-compose-wait --docker-compose-wait-timeout=120
 ```
+
+Waiting remains opt-in for backward compatibility. It is planned to become the default in version 1.0.
 
 #### Option 2: Python-based Wait Fixtures
 
@@ -246,8 +248,7 @@ This option will be ignored if the plugin is not used. Again, this option can al
 | `--docker-compose-no-build` | Skip building Docker images before running tests. |
 | `--docker-compose-remove-volumes` | Remove container volumes after tests complete. |
 | `--use-running-containers` | Use already running containers instead of starting new ones. |
-| `--docker-compose-no-wait` | Don't wait for services to be healthy before running tests (waiting is enabled by default). |
+| `--docker-compose-wait` | Wait for services to be healthy before running tests (requires healthcheck definitions). |
 | `--docker-compose-wait-timeout` | Timeout in seconds when waiting for services to be healthy. |
 
 For more examples on how to use this plugin look at the testing suite of this plugin itself! It will give you some examples for configuring `pyproject.toml` and how to use the different fixtures to run docker containers.
-

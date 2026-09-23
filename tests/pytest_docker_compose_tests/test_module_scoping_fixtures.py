@@ -6,9 +6,6 @@ from requests.adapters import HTTPAdapter
 
 import pytest
 
-pytestmark = pytest.mark.no_wait
-
-
 @pytest.fixture(scope="module")
 def wait_for_api(module_scoped_container_getter):
     """Wait for the api from my_api_service to become responsive"""

@@ -126,11 +126,11 @@ class DockerComposePlugin:
         )
 
         group.addoption(
-            "--docker-compose-no-wait",
+            "--docker-compose-wait",
             action="store_true",
             default=False,
-            help="Don't wait for services to be healthy before running tests "
-            "(by default, the plugin waits for healthchecks if defined)",
+            help="Wait for services to be healthy before running tests "
+            "(requires healthcheck definitions in docker-compose.yml)",
         )
 
         group.addoption(
@@ -201,7 +201,7 @@ class DockerComposePlugin:
             project.compose.up(
                 detach=True,
                 quiet=True,
-                wait=not request.config.getoption("--docker-compose-no-wait"),
+                wait=request.config.getoption("--docker-compose-wait"),
                 wait_timeout=request.config.getoption("--docker-compose-wait-timeout"),
             )
             containers = list(project.compose.config().services.keys())
@@ -260,7 +260,7 @@ class DockerComposePlugin:
                 docker_project.compose.up(
                     detach=True,
                     quiet=True,
-                    wait=not request.config.getoption("--docker-compose-no-wait"),
+                    wait=request.config.getoption("--docker-compose-wait"),
                     wait_timeout=request.config.getoption("--docker-compose-wait-timeout"),
                 )
                 if not any(docker_project.compose.ps()):
