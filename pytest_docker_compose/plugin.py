@@ -1,6 +1,6 @@
 import os.path
 import warnings
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -237,7 +237,7 @@ class DockerComposePlugin:
 
         @pytest.fixture(scope=scope)  # type: ignore
         def scoped_containers_fixture(docker_project: DockerClient, request):
-            now = datetime.now(UTC)
+            now = datetime.now(timezone.utc)
             if not request.config.getoption("--use-running-containers"):
                 if any(
                     container
