@@ -58,6 +58,7 @@ dev = [
     "tox>=4.30.3",
     "tox-uv>=1.28.1",
     "pytest>=8,<10",
+    "rust-just>=1.58.0",
 ]
 
 [tool.hatch.version]

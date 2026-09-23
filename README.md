@@ -252,3 +252,35 @@ This option will be ignored if the plugin is not used. Again, this option can al
 | `--docker-compose-wait-timeout` | Timeout in seconds when waiting for services to be healthy. |
 
 For more examples on how to use this plugin look at the testing suite of this plugin itself! It will give you some examples for configuring `pyproject.toml` and how to use the different fixtures to run docker containers.
+
+## Releasing
+
+Release commands are managed with `just`, which is installed by the development
+dependency group:
+
+```shell
+uv sync
+```
+
+Preview the release notes for a version without modifying the repository:
+
+```shell
+uv run just release-notes 0.3.0
+```
+
+Create and push a release from a clean, up-to-date `main` branch by choosing a
+semantic version increment:
+
+```shell
+uv run just release patch
+uv run just release minor
+uv run just release major
+```
+
+The command runs the tests, updates the package version, creates the version
+commit and tag, and pushes both. Once GitHub Actions has created the GitHub
+Release, its generated notes can be added with:
+
+```shell
+uv run just publish-release-notes 0.3.0
+```
