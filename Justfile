@@ -14,7 +14,10 @@ release-notes version:
         previous="$(git describe --tags --abbrev=0 HEAD)"
     fi
 
-    uv run git-cliff "${previous}..${revision}" --tag "${version}"
+    uv run git-cliff "${previous}..${revision}" \
+        --tag "${version}" \
+        --config keepachangelog \
+        --strip all
 
 # Add generated notes to an existing GitHub release (requires the GitHub CLI).
 publish-release-notes version:
