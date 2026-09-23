@@ -7,7 +7,8 @@ release-notes version:
 
     version="{{ version }}"
     if git show-ref --verify --quiet "refs/tags/${version}"; then
-        revision="${version}"
+        # bumpver tags its generated version commit; omit that mechanical commit.
+        revision="${version}^"
         previous="$(git describe --tags --abbrev=0 "${version}^")"
     else
         revision="HEAD"
