@@ -11,8 +11,6 @@ from python_on_whales.components.container.cli_wrapper import Container
 class ContainersAlreadyExist(Exception):
     """Raised when running containers are unexpectedly found"""
 
-    pass
-
 
 __all__ = [
     "DockerComposePlugin",
@@ -159,10 +157,8 @@ class DockerComposePlugin:
 
             if not docker_compose.is_file():
                 raise ValueError(
-                    "Unable to find `{docker_compose}` "
-                    "for integration tests.".format(
-                        docker_compose=docker_compose.absolute(),
-                    ),
+                    f"Unable to find `{docker_compose.absolute()}` "
+                    "for integration tests.",
                 )
 
             compose_files.append(docker_compose)
@@ -205,7 +201,7 @@ class DockerComposePlugin:
                 wait_timeout=request.config.getoption("--docker-compose-wait-timeout"),
             )
             containers = list(project.compose.config().services.keys())
-            if not len(current_containers) == len(containers):
+            if len(current_containers) != len(containers):
                 warnings.warn(
                     UserWarning(
                         "You used the '--use-running-containers' but "
@@ -215,11 +211,9 @@ class DockerComposePlugin:
                 )
         else:
             if any(
-                (
-                    container
-                    for container in project.compose.ps()
-                    if container.state.running
-                )
+                container
+                for container in project.compose.ps()
+                if container.state.running
             ):
                 raise ContainersAlreadyExist(
                     "There are already existing containers, please remove all "
@@ -246,16 +240,14 @@ class DockerComposePlugin:
             now = datetime.now(timezone.utc)
             if not request.config.getoption("--use-running-containers"):
                 if any(
-                    (
-                        container
-                        for container in docker_project.compose.ps()
-                        if container.state.running
-                    )
+                    container
+                    for container in docker_project.compose.ps()
+                    if container.state.running
                 ):
                     raise ContainersAlreadyExist(
                         "pytest-docker-compose tried to start containers but there are"
-                        " already running containers: %s, you probably scoped your"
-                        " tests wrong" % docker_project.compose.ps()
+                        f" already running containers: {docker_project.compose.ps()},"
+                        " you probably scoped your tests wrong"
                     )
                 docker_project.compose.up(
                     detach=True,
@@ -272,7 +264,7 @@ class DockerComposePlugin:
             if request.config.getoption("--verbose"):
                 containers = docker_project.compose.ps()
                 for container in sorted(containers, key=lambda c: c.name):
-                    header = "Logs from {name}:".format(name=container.name)
+                    header = f"Logs from {container.name}:"
                     print(header, "\n", "=" * len(header))
                     print(
                         container.logs(since=now) or "(no logs)",
@@ -284,16 +276,13 @@ class DockerComposePlugin:
                     volumes=request.config.getoption("--docker-compose-remove-volumes")
                 )
 
-        scoped_containers_fixture.__wrapped__.__doc__ = (
-            """
+        scoped_containers_fixture.__wrapped__.__doc__ = f"""
             Spins up the containers for the Docker project and returns an
             object that can retrieve the containers. The returned containers
             all have one additional attribute called network_info to simplify
             accessing the hostnames and exposed port numbers for each container.
-            This set of containers is scoped to '%s'
+            This set of containers is scoped to '{scope}'
             """
-            % scope
-        )
         return scoped_containers_fixture
 
 
@@ -330,8 +319,8 @@ class ContainerGetter:
         if not containers_running.get(key):
             warnings.warn(
                 UserWarning(
-                    "The service '%s' only has a stopped container, "
-                    "it stopped with '%s'" % (key, container.state.status)
+                    f"The service '{key}' only has a stopped container, "
+                    f"it stopped with '{container.state.status}'"
                 )
             )
         network_info = create_network_info_for_container(container)
