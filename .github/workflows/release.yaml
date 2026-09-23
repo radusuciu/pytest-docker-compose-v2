@@ -16,9 +16,9 @@ jobs:
       id-token: write
     steps:
     - name: Check out repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v7
     - name: Set up uv
-      uses: astral-sh/setup-uv@v7
+      uses: astral-sh/setup-uv@v10.2.0
       with:
         enable-cache: true
         python-version: '3.13'
@@ -28,7 +28,7 @@ jobs:
     - name: Run tests
       run: uv run pytest
     - name: Create GitHub release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v3
       with:
         name: Release ${{ github.ref }}
         tag_name: ${{ github.ref }}
