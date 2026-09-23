@@ -6,6 +6,8 @@ services:
     depends_on:
       my_db:
         condition: service_healthy
+      my_short_lived_service:
+        condition: service_completed_successfully
     restart: on-failure
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/')"]
