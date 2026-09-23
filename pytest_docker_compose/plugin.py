@@ -125,6 +125,21 @@ class DockerComposePlugin:
             "instead of calling 'docker-compose up'",
         )
 
+        group.addoption(
+            "--docker-compose-wait",
+            action="store_true",
+            default=False,
+            help="Wait for services to be healthy before running tests "
+            "(requires healthcheck definitions in docker-compose.yml)",
+        )
+
+        group.addoption(
+            "--docker-compose-wait-timeout",
+            type=int,
+            default=None,
+            help="Timeout in seconds when waiting for services to be healthy",
+        )
+
     @pytest.fixture(scope="session")
     def docker_project(self, request):
         """
@@ -183,10 +198,13 @@ class DockerComposePlugin:
                     )
                 )
             current_containers = project.compose.ps()
-            project.compose.up(detach=True, quiet=True)
-            containers = [
-                key for key, value in project.compose.config().services.items()
-            ]
+            project.compose.up(
+                detach=True,
+                quiet=True,
+                wait=request.config.getoption("--docker-compose-wait"),
+                wait_timeout=request.config.getoption("--docker-compose-wait-timeout"),
+            )
+            containers = list(project.compose.config().services.keys())
             if not len(current_containers) == len(containers):
                 warnings.warn(
                     UserWarning(
@@ -239,7 +257,12 @@ class DockerComposePlugin:
                         " already running containers: %s, you probably scoped your"
                         " tests wrong" % docker_project.compose.ps()
                     )
-                docker_project.compose.up(detach=True, quiet=True)
+                docker_project.compose.up(
+                    detach=True,
+                    quiet=True,
+                    wait=request.config.getoption("--docker-compose-wait"),
+                    wait_timeout=request.config.getoption("--docker-compose-wait-timeout"),
+                )
                 if not any(docker_project.compose.ps()):
                     raise ValueError("`docker-compose` didn't launch any containers!")
 
